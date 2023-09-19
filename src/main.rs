@@ -1,7 +1,29 @@
+use disk_persist::DiskPersist;
 use requestty::Question;
 use reqwest::blocking::Client;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use url::Url;
+
+#[derive(Serialize, Deserialize, Debug)]
+struct LocalCache {
+    api_base_url: String,
+    session_id: String,
+    session_expires: String,
+    username: String,
+}
+
+#[derive(Deserialize, Debug)]
+struct ShioriLogin {
+    session: String,
+    expires: String,
+    account: ShioriUserAccount,
+}
+
+#[derive(Deserialize, Debug)]
+struct ShioriUserAccount {
+    username: String,
+}
 
 fn main() {
     let http_client = reqwest::blocking::Client::new();
@@ -60,7 +82,16 @@ fn login(http_client: Client) {
                 .expect("HTTP Response")
                 .text();
 
-            println!("body = {:?}", response);
+            let login: ShioriLogin = serde_json::from_str(response.unwrap().as_str()).unwrap();
+            let data_to_persist = LocalCache {
+                api_base_url: api_base_url.unwrap().to_string(),
+                session_id: login.session,
+                session_expires: login.expires,
+                username: login.account.username,
+            };
+
+            let persist: DiskPersist<LocalCache> = DiskPersist::init("shiori-cli").unwrap();
+            persist.write(&data_to_persist).unwrap();
         }
         Err(_error) => {}
     }
