@@ -46,7 +46,7 @@ fn login(http_client: Client) {
         Question::input("username")
             .message("What's your username")
             .validate(|name, _previous_answers| {
-                if name.trim().len() > 0 {
+                if !name.trim().is_empty() {
                     Ok(())
                 } else {
                     Err("Please enter your username".to_owned())
