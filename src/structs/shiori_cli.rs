@@ -1,4 +1,16 @@
+use clap::{Parser, Subcommand};
 use serde::{Deserialize, Serialize};
+
+#[derive(Parser, Debug)]
+pub struct Arguments {
+    #[command(subcommand)]
+    pub command: Option<Commands>,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum Commands {
+    Login {},
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LocalCache {
