@@ -3,9 +3,9 @@ mod structs;
 
 use clap::Parser;
 use disk_persist::DiskPersist;
-use structs::shiori_cli::{Arguments, Commands, LocalCache};
 
 use crate::login::login;
+use crate::structs::shiori_cli::{Arguments, Commands, LocalCache};
 
 fn main() {
     let arguments = Arguments::parse();

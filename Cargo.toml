@@ -1,5 +1,6 @@
 [package]
 name = "shiori-cli"
+description = "Manage your shiori bookmarks conveniently from the CLI"
 version = "0.1.0"
 edition = "2021"
 

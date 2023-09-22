@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand};
 use serde::{Deserialize, Serialize};
 
 #[derive(Parser, Debug)]
+#[command(about, version)]
 pub struct Arguments {
     #[command(subcommand)]
     pub command: Commands,
@@ -9,6 +10,7 @@ pub struct Arguments {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
+    /// Starts a wizard which guides you through the login
     Login {},
 }
 
