@@ -10,73 +10,113 @@ pub fn login(persist: DiskPersist<LocalCache>, http_client: Client) {
 
     match local_cache {
         Some(_local_cache) => {
-            println!("Nothing to do, you seem to be logged in");
+            println!("Nothing to do, you seem to be logged in")
         }
         None => {
-            let questions = vec![
-                Question::input("api_base_url")
-                    .message("Where's your shiori instance located at")
-                    .validate(|api_base_url, _previous_answers| {
-                        if Url::parse(api_base_url).is_ok() {
-                            Ok(())
-                        } else {
-                            Err("Please enter a valid URL".to_owned())
-                        }
-                    })
-                    .build(),
-                Question::input("username")
-                    .message("What's your username")
-                    .validate(|name, _previous_answers| {
-                        if !name.trim().is_empty() {
-                            Ok(())
-                        } else {
-                            Err("Please enter your username".to_owned())
-                        }
-                    })
-                    .build(),
-                Question::password("password")
-                    .message("What's your password")
-                    .build(),
-            ];
+            let answers = ask_login_questions();
+            let api_base_url = answers.api_base_url;
+            let username = answers.username;
+            let password = answers.password;
 
-            let answers = requestty::prompt(questions);
+            let mut login_url = Url::parse(&api_base_url).unwrap();
+            login_url.set_path("api/login");
 
-            match answers {
-                Ok(answers) => {
-                    let api_base_url = answers.get("api_base_url").unwrap().as_string();
-                    let username = answers.get("username").unwrap().as_string();
-                    let password = answers.get("password").unwrap().as_string();
+            let payload = serde_json::json!({
+                "username": username,
+                "password": password,
+                "remember": true,
+            });
 
-                    let mut login_url = Url::parse(api_base_url.unwrap()).unwrap();
-                    login_url.set_path("api/login");
+            let response = http_client
+                .post(login_url)
+                .json(&payload)
+                .send()
+                .unwrap()
+                .text();
 
-                    let payload = serde_json::json!({
-                        "username": username,
-                        "password": password,
-                        "remember": true,
-                    });
+            match response {
+                Ok(response) => match serde_json::from_str::<ShioriLogin>(response.as_str()) {
+                    Ok(json) => {
+                        let data_to_persist = LocalCache {
+                            api_base_url,
+                            session_id: json.session,
+                            session_expires: json.expires,
+                            username: json.account.username,
+                        };
+                        persist.write(&data_to_persist).unwrap();
 
-                    let response = http_client
-                        .post(login_url)
-                        .json(&payload)
-                        .send()
-                        .expect("HTTP Response")
-                        .text();
-
-                    let login: ShioriLogin =
-                        serde_json::from_str(response.unwrap().as_str()).unwrap();
-                    let data_to_persist = LocalCache {
-                        api_base_url: api_base_url.unwrap().to_string(),
-                        session_id: login.session,
-                        session_expires: login.expires,
-                        username: login.account.username,
-                    };
-
-                    persist.write(&data_to_persist).unwrap();
-                    println!("Welcome 🤗");
+                        println!("Welcome 🤗");
+                    }
+                    Err(_error) => {
+                        println!("Something went wrong 😞");
+                    }
+                },
+                Err(_error) => {
+                    println!("Something went wrong 😞");
                 }
-                Err(_error) => {}
             }
+        }
+    }
+}
+
+struct LoginWizardAnswers {
+    api_base_url: String,
+    username: String,
+    password: String,
+}
+
+fn ask_login_questions() -> LoginWizardAnswers {
+    let questions = vec![
+        Question::input("api_base_url")
+            .message("Where's your shiori instance located at")
+            .validate(|api_base_url, _previous_answers| {
+                if Url::parse(api_base_url).is_ok() {
+                    Ok(())
+                } else {
+                    Err("Please enter a valid URL".to_owned())
+                }
+            })
+            .build(),
+        Question::input("username")
+            .message("What's your username")
+            .validate(|name, _previous_answers| {
+                if !name.trim().is_empty() {
+                    Ok(())
+                } else {
+                    Err("Please enter your username".to_owned())
+                }
+            })
+            .build(),
+        Question::password("password")
+            .message("What's your password")
+            .build(),
+    ];
+
+    match requestty::prompt(questions) {
+        Ok(answers) => {
+            return LoginWizardAnswers {
+                api_base_url: answers
+                    .get("api_base_url")
+                    .unwrap()
+                    .as_string()
+                    .unwrap()
+                    .to_string(),
+                username: answers
+                    .get("username")
+                    .unwrap()
+                    .as_string()
+                    .unwrap()
+                    .to_string(),
+                password: answers
+                    .get("password")
+                    .unwrap()
+                    .as_string()
+                    .unwrap()
+                    .to_string(),
+            }
+        }
+        Err(_error) => {
+            panic!("Something went wrong while trying to login");
         }
     }
 }
