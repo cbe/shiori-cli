@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Parser, Debug)]
 pub struct Arguments {
     #[command(subcommand)]
-    pub command: Option<Commands>,
+    pub command: Commands,
 }
 
 #[derive(Subcommand, Debug)]

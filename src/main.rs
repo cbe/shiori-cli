@@ -13,10 +13,9 @@ fn main() {
     let http_client = reqwest::blocking::Client::new();
 
     match &arguments.command {
-        Some(Commands::Login {}) => {
+        Commands::Login {} => {
             login(persist, http_client);
         }
-        None => {}
     }
 
 }
