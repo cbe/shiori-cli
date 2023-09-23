@@ -7,52 +7,47 @@ use crate::structs::{shiori_api::ShioriLogin, shiori_cli::LocalCache};
 use crate::validate;
 
 pub fn login(http_client: Client, persist: DiskPersist<LocalCache>) {
-    let logged_in = validate::check_logged_in(&persist);
+    let is_logged_in = validate::check_logged_in(&persist);
+    let answers = ask_login_questions(is_logged_in);
+    let api_base_url = answers.api_base_url;
+    let username = answers.username;
+    let password = answers.password;
 
-    if logged_in {
-        println!("😎 Nothing to do, you seem to be logged in ")
-    } else {
-        let answers = ask_login_questions();
-        let api_base_url = answers.api_base_url;
-        let username = answers.username;
-        let password = answers.password;
+    let mut login_url = Url::parse(&api_base_url).unwrap();
+    login_url.set_path("api/login");
 
-        let mut login_url = Url::parse(&api_base_url).unwrap();
-        login_url.set_path("api/login");
+    let payload = serde_json::json!({
+        "username": username,
+        "password": password,
+        "remember": true,
+    });
 
-        let payload = serde_json::json!({
-            "username": username,
-            "password": password,
-            "remember": true,
-        });
+    let response = http_client
+        .post(login_url)
+        .json(&payload)
+        .send()
+        .unwrap()
+        .text();
 
-        let response = http_client
-            .post(login_url)
-            .json(&payload)
-            .send()
-            .unwrap()
-            .text();
+    match response {
+        Ok(response) => match serde_json::from_str::<ShioriLogin>(response.as_str()) {
+            Ok(json) => {
+                let data_to_persist = LocalCache {
+                    api_base_url,
+                    session_id: json.session,
+                    session_expires: json.expires,
+                    username: json.account.username,
+                };
+                persist.write(&data_to_persist).unwrap();
 
-        match response {
-            Ok(response) => match serde_json::from_str::<ShioriLogin>(response.as_str()) {
-                Ok(json) => {
-                    let data_to_persist = LocalCache {
-                        api_base_url,
-                        session_id: json.session,
-                        session_expires: json.expires,
-                        username: json.account.username,
-                    };
-                    persist.write(&data_to_persist).unwrap();
-
-                    println!("🎉 Hello");
-                }
-                Err(_error) => {
-                    println!("😞 Something went wrong");
-                }
-            },
+                println!("🎉 Hello");
+            }
             Err(_error) => {
                 println!("😞 Something went wrong");
             }
+        },
+        Err(_error) => {
+            println!("😞 Something went wrong");
         }
     }
 }
@@ -63,7 +58,19 @@ struct LoginWizardAnswers {
     password: String,
 }
 
-fn ask_login_questions() -> LoginWizardAnswers {
+fn ask_login_questions(is_logged_in: bool) -> LoginWizardAnswers {
+    if is_logged_in {
+        let question = Question::confirm("continue_login")
+            .message("You seem to be logged in, want to continue?")
+            .default(false)
+            .build();
+
+        let continue_login = requestty::prompt_one(question).unwrap().as_bool().unwrap();
+        if !continue_login {
+            std::process::exit(1);
+        }
+    }
+
     let questions = vec![
         Question::input("api_base_url")
             .message("Where's your shiori instance located at")
