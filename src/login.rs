@@ -8,8 +8,8 @@ use crate::structs::{shiori_api::ShioriLogin, shiori_cli::LocalCache};
 pub fn login(persist: DiskPersist<LocalCache>, http_client: Client) {
     let local_cache = persist.read().unwrap();
 
-    match local_cache {
-        Some(_local_cache) => {
+    match local_cache.and_then(|local_cache| Some(local_cache.session_id)) {
+        Some(_session_id) => {
             println!("Nothing to do, you seem to be logged in")
         }
         None => {
