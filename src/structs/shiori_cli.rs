@@ -12,6 +12,8 @@ pub struct Arguments {
 pub enum Commands {
     /// Starts a wizard which guides you through the login
     Login {},
+    /// Log out of the current session
+    Logout {},
     /// Add a bookmark
     Add {
         /// Tags to apply to this bookmark, can be given multiple times

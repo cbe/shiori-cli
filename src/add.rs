@@ -13,10 +13,8 @@ pub fn add(http_client: Client, persist: DiskPersist<LocalCache>, tags: Vec<Stri
     }
 
     let local_cache = persist.read().unwrap().unwrap();
-
     let mut add_bookmark_url = Url::parse(&local_cache.api_base_url).unwrap();
     add_bookmark_url.set_path("api/bookmarks");
-
     let shiori_tags: Vec<_> = tags
         .iter()
         .flat_map(|tag| -> Vec<_> { tag.split(',').collect() })

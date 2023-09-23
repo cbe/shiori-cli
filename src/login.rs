@@ -14,13 +14,11 @@ pub fn login(http_client: Client, persist: DiskPersist<LocalCache>) {
 
     let mut login_url = Url::parse(&api_base_url).unwrap();
     login_url.set_path("api/login");
-
     let payload = serde_json::json!({
         "username": username,
         "password": password,
         "remember": true,
     });
-
     let response = http_client.post(login_url).json(&payload).send();
 
     match response {

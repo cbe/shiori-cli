@@ -1,5 +1,6 @@
 mod add;
 mod login;
+mod logout;
 mod structs;
 mod tags;
 mod validate;
@@ -9,6 +10,7 @@ use disk_persist::DiskPersist;
 
 use crate::add::add;
 use crate::login::login;
+use crate::logout::logout;
 use crate::structs::shiori_cli::{Arguments, Commands, LocalCache};
 
 static EXIT_CODE_SUCCESS: i32 = 0;
@@ -22,6 +24,9 @@ fn main() {
     match &arguments.command {
         Commands::Login {} => {
             login(http_client, persist);
+        }
+        Commands::Logout {} => {
+            logout(http_client, persist);
         }
         Commands::Add { tags, url } => {
             add(http_client, persist, tags.to_vec(), url.to_string());

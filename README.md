@@ -7,7 +7,7 @@ Manage your [shiori](https://github.com/go-shiori/shiori) bookmarks conveniently
 | Feature          | State |
 | ---------------- | :---: |
 | Log in           |  ✅   |
-| Log out          |  ❌   |
+| Log out          |  ✅   |
 | Get bookmarks    |  ❌   |
 | Add bookmarks    |  ✅   |
 | Edit bookmarks   |  ❌   |
