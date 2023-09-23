@@ -12,7 +12,7 @@ Manage your [shiori](https://github.com/go-shiori/shiori) bookmarks conveniently
 | Add bookmarks    |  ✅   |
 | Edit bookmarks   |  ❌   |
 | Delete bookmarks |  ❌   |
-| Get tags         |  ❌   |
+| Get tags         |  ✅   |
 | Rename tags      |  ❌   |
 
 ## Installation

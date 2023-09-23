@@ -20,6 +20,8 @@ pub enum Commands {
 
         url: String,
     },
+    /// List existing tags
+    GetTags {},
 }
 
 #[derive(Serialize, Deserialize, Debug)]

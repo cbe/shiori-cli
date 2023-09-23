@@ -26,3 +26,8 @@ pub struct ShioriResponseAddBookmark {
     pub url: String,
     pub title: String,
 }
+
+#[derive(Deserialize, Debug)]
+pub struct ShioriResponseGetTag {
+    pub name: String,
+}

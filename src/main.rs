@@ -1,6 +1,7 @@
 mod add;
 mod login;
 mod structs;
+mod tags;
 mod validate;
 
 use clap::Parser;
@@ -24,6 +25,9 @@ fn main() {
         }
         Commands::Add { tags, url } => {
             add(http_client, persist, tags.to_vec(), url.to_string());
+        }
+        Commands::GetTags {} => {
+            tags::get_tags(http_client, persist);
         }
     }
 
