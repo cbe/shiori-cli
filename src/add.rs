@@ -19,6 +19,7 @@ pub fn add(http_client: Client, persist: DiskPersist<LocalCache>, tags: Vec<Stri
 
     let shiori_tags: Vec<_> = tags
         .iter()
+        .flat_map(|tag| -> Vec<_> { tag.split(',').collect() })
         .map(|tag| ShioriRequestTag {
             name: tag.to_string(),
         })

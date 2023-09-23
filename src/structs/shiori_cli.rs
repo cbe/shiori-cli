@@ -15,6 +15,7 @@ pub enum Commands {
     /// Add a bookmark
     Add {
         /// Tags to apply to this bookmark, can be given multiple times
+        /// or as comma-separated list
         #[arg(short, long)]
         tags: Vec<String>,
 
