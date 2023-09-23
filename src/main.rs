@@ -1,5 +1,6 @@
 mod login;
 mod structs;
+mod validate;
 
 use clap::Parser;
 use disk_persist::DiskPersist;
@@ -14,7 +15,7 @@ fn main() {
 
     match &arguments.command {
         Commands::Login {} => {
-            login(persist, http_client);
+            login(http_client, persist);
         }
     }
 
