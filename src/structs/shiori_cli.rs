@@ -12,6 +12,14 @@ pub struct Arguments {
 pub enum Commands {
     /// Starts a wizard which guides you through the login
     Login {},
+    /// Add a bookmark
+    Add {
+        /// Tags to apply to this bookmark, can be given multiple times
+        #[arg(short, long)]
+        tags: Vec<String>,
+
+        url: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
