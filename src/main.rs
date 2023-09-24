@@ -1,4 +1,4 @@
-mod add;
+mod bookmarks;
 mod login;
 mod logout;
 mod structs;
@@ -8,7 +8,6 @@ mod validate;
 use clap::Parser;
 use disk_persist::DiskPersist;
 
-use crate::add::add;
 use crate::login::login;
 use crate::logout::logout;
 use crate::structs::shiori_cli::{Arguments, Commands, LocalCache};
@@ -22,17 +21,25 @@ fn main() {
     let http_client = reqwest::blocking::Client::new();
 
     match &arguments.command {
+        // Session
         Commands::Login {} => {
             login(http_client, persist);
         }
         Commands::Logout {} => {
             logout(http_client, persist);
         }
+
+        // Bookmarks
         Commands::Add { tags, url } => {
-            add(http_client, persist, tags.to_vec(), url.to_string());
+            bookmarks::add(http_client, persist, tags.to_vec(), url.to_string());
         }
+        Commands::List {} => {
+            bookmarks::list(http_client, persist);
+        }
+
+        // Tags
         Commands::GetTags {} => {
-            tags::get_tags(http_client, persist);
+            tags::list(http_client, persist);
         }
     }
 

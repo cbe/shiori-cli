@@ -7,7 +7,7 @@ use crate::{
     validate, EXIT_CODE_ERROR, EXIT_CODE_SUCCESS,
 };
 
-pub fn get_tags(http_client: Client, persist: DiskPersist<LocalCache>) {
+pub fn list(http_client: Client, persist: DiskPersist<LocalCache>) {
     if !validate::check_logged_in(&persist) {
         println!("🤷 You're not logged in, please log in first");
         std::process::exit(EXIT_CODE_ERROR);

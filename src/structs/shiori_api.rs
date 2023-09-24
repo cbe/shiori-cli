@@ -31,6 +31,18 @@ pub struct ShioriResponseAddBookmark {
 }
 
 #[derive(Deserialize, Debug)]
+pub struct ShioriResponseBookmark {
+    pub url: String,
+    pub title: String,
+    pub tags: Vec<ShoiriResponseTag>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ShioriResponseGetBookmarks {
+    pub bookmarks: Vec<ShioriResponseBookmark>,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct ShioriResponseGetTag {
     pub name: String,
 }

@@ -14,6 +14,7 @@ pub enum Commands {
     Login {},
     /// Log out of the current session
     Logout {},
+
     /// Add a bookmark
     Add {
         /// Tags to apply to this bookmark, can be given multiple times
@@ -23,6 +24,9 @@ pub enum Commands {
 
         url: String,
     },
+    /// List the most recent bookmarks
+    List {},
+
     /// List existing tags
     GetTags {},
 }
