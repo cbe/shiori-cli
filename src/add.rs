@@ -12,6 +12,11 @@ pub fn add(http_client: Client, persist: DiskPersist<LocalCache>, tags: Vec<Stri
         std::process::exit(EXIT_CODE_ERROR);
     }
 
+    if Url::parse(&url).is_err() {
+        println!("🔗 <URL> must be a valid URL, got {:?}", url);
+        std::process::exit(EXIT_CODE_ERROR);
+    }
+
     let local_cache = persist.read().unwrap().unwrap();
     let mut add_bookmark_url = Url::parse(&local_cache.api_base_url).unwrap();
     add_bookmark_url.set_path("api/bookmarks");
