@@ -53,7 +53,15 @@ pub fn add(http_client: Client, persist: DiskPersist<LocalCache>, tags: Vec<Stri
                 .unwrap();
 
             println!("🔖 Bookmark created");
-            println!("URL {:#}", json.url);
+            println!("URL:  {}", json.url);
+            println!(
+                "Tags: {}",
+                json.tags
+                    .iter()
+                    .map(|tag| tag.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
             std::process::exit(EXIT_CODE_SUCCESS);
         }
         Err(_error) => {

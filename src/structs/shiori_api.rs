@@ -21,10 +21,13 @@ pub struct ShioriResponseUserAccount {
     pub username: String,
 }
 
+pub type ShoiriResponseTag = ShioriRequestTag;
+
 #[derive(Deserialize, Debug)]
 pub struct ShioriResponseAddBookmark {
     pub url: String,
     pub title: String,
+    pub tags: Vec<ShoiriResponseTag>,
 }
 
 #[derive(Deserialize, Debug)]
